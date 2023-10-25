@@ -1,17 +1,12 @@
 
-if 1==0:
-    #_NOT_IN_PAPER [
-    #_NOT_IN_PAPER ]
-    pass
-
-if 1==1:
-    ########### Seed random gen ############
-    #_NOT_IN_PAPER [
-    npseed = 10
-    
-    import numpy as np
-    np.random.seed(npseed)
-    #_NOT_IN_PAPER ]
+#_NOT_IN_PAPER [
+########### Seed random gen ############
+import numpy as np
+import random
+seed = 8
+np.random.seed(seed)
+random.seed(seed)
+#_NOT_IN_PAPER ]
 
 # PARENT LATTICE - create
 if 1==0:
@@ -58,12 +53,7 @@ if 1==1:
     #_NOT_IN_PAPER ]
 
 # STRUCTURES SET - create
-if 1==1:
-    #_NOT_IN_PAPER [
-    import numpy as np
-    np.random.seed(npseed)
-    #_NOT_IN_PAPER ]
-    
+if 1==1:    
     ########### RandomStructures ############
     from clusterx.structures_set import StructuresSet
     sset = StructuresSet(platt)
@@ -115,7 +105,7 @@ if 1==1:
     #_NOT_IN_PAPER ]
 
 # REFERENCES - compute
-if 1==0:
+if 1==1:
     #_NOT_IN_PAPER [
     from optcu_functions import references
     eCu_bulk, ePt_bulk, eO, eCu_slab, infostr = references()
@@ -124,7 +114,7 @@ if 1==0:
     print(infostr)
     #_NOT_IN_PAPER ]
 
-if 1==0:
+if 1==1:
     #_NOT_IN_PAPER [
     from optcu_functions import total_energy
 
@@ -132,7 +122,7 @@ if 1==0:
     print(e0,e1)
     #_NOT_IN_PAPER [
 
-if 1==0:
+if 1==1:
     ################ Adsorption energy relaxed ################
     from optcu_functions import ads_energy
     sset.calculate_property(prop_name="e_ads",prop_func=ads_energy)
@@ -145,18 +135,18 @@ if 1==0:
     #_NOT_IN_PAPER ]
     
 
-if 1==0:
+if 1==1:
     #_NOT_IN_PAPER [
     ################ Other properties ################
-    xO = lambda s : s.get_fractional_concentrations()[0][1]
-    xPt = lambda s : s.get_fractional_concentrations()[2][1]
+    xO = lambda i, s : s.get_fractional_concentrations()[0][1]
+    xPt = lambda i, s : s.get_fractional_concentrations()[2][1]
     sset.calculate_property(prop_name="conc_O",prop_func=xO)
     sset.calculate_property(prop_name="conc_Pt",prop_func=xPt)
     ######################################
     #_NOT_IN_PAPER ]
 
 
-if 1==0:
+if 1==1:
     ################ Visualization: e ads rnd ################
     from clusterx.visualization import plot_property_vs_concentration
     plot_property_vs_concentration(
@@ -164,8 +154,10 @@ if 1==0:
         site_type=2,
         property_name ="e_ads",
         show_plot = False,
-        yaxis_label = "$E_{\\textrm{ads}}(\\bm{\\sigma})$ [arb. units]",
-        fname="optcu_PLOT_1.png"
+        #yaxis_label = "$E_{\\textrm{ads}}(\\bm{\\sigma})$ [arb. units]",
+        yaxis_label = "Energy of adsorption [a.u.]",
+        fig_fname="optcu_PLOT_1.png",
+        data_fname="optcu_PLOT_1.txt"
     )
     ######################################
 
@@ -173,21 +165,21 @@ if 1==0:
     ############### Clusters Pool ###############
     from clusterx.clusters.clusters_pool import ClustersPool
     cpool = ClustersPool(platt,
-    			 npoints=[0,1,2,3,4],
-    			 radii=[0,0,-1,-1,4.3],
-    			 super_cell=scell)
+    			 npoints=[1,2,3,4],
+    			 radii=[0,-1,-1,4.3],
+    			 super_cell=scell, method=1)
     
     cpool.serialize(db_name="optcu_CPOOL.json")
-    cpool.display_info()
+    cpool.print_info()
     ######################################
 
-if 1==0:
+if 1==1:
     #_NOT_IN_PAPER [
     from clusterx.clusters.clusters_pool import ClustersPool
     cpool = ClustersPool(json_db_filepath="optcu_CPOOL.json")
     #_NOT_IN_PAPER ]
 
-if 1==0:
+if 1==1:
     from clusterx.correlations import CorrelationsCalculator
     corrcal = CorrelationsCalculator("trigonometric", platt, cpool)
 
@@ -215,7 +207,7 @@ if 1==0:
     p = xp["p"]
     #_NOT_IN_PAPER ]
 
-if 1==0:
+if 1==1:
     from clusterx.estimators.estimator_factory import EstimatorFactory
     from clusterx.model import Model
 
@@ -236,34 +228,33 @@ if 1==0:
     #_NOT_IN_PAPER ]
     
 
-if 1==0:
+if 1==1:
     from clusterx.model import ModelBuilder
-    mb = ModelBuilder(
-	selector_type="subsets_cv", 
-	selector_opts={"clusters_sets": "size"}, 
-	estimator_type="skl_Ridge", 
-	estimator_opts={"alpha":1e-8,"fit_intercept":False})
+    mb_2 = ModelBuilder(
+        selector_type="subsets_cv", 
+        selector_opts={"clusters_sets": "size"}, 
+        estimator_type="skl_Ridge", 
+        estimator_opts={"alpha":1e-8,"fit_intercept":True})
 
-    ce_model_2 = mb.build(sset, cpool, "e_ads")
+    ce_model_2 = mb_2.build(sset, cpool, "e_ads")
     ce_model_2.report_errors(sset)
 
     #_NOT_IN_PAPER [
     ce_model_2.serialize(filepath="optcu_CE_MODEL_2.pickle", fmt="pickle")
-    mb.serialize(filepath="optcu_MODELBDR_2.pickle")
-    opt_cpool=mb.get_opt_cpool()
-    opt_cpool.serialize(db_name="optcu_CPOOL_OPT_2.json")
+    #mb_2.serialize(filepath="optcu_MODELBDR_2.pickle") -- fails with "TypeError: cannot pickle '_io.BufferedWriter' object"
+    opt_cpool_2=mb_2.get_opt_cpool()
+    opt_cpool_2.serialize(db_name="optcu_CPOOL_OPT_2.json")
     #_NOT_IN_PAPER ]
     
 if 1==0:
     #_NOT_IN_PAPER [
     from clusterx.model import Model, ModelBuilder
     ce_model_2 = Model(filepath = "optcu_CE_MODEL_2.pickle")
-    mb = ModelBuilder(filepath="optcu_MODELBDR_2.pickle")
-    opt_cpool = mb.get_opt_cpool()
-    #_NOT_IN_PAPER
-
-    
-if 1==0:
+    mb_2 = ModelBuilder(filepath="optcu_MODELBDR_2.pickle")
+    opt_cpool_2 = mb_2.get_opt_cpool()
+    #_NOT_IN_PAPER ]
+   
+if 1==1:
     ################ Visualization: e ads rnd ################
     from clusterx.visualization import plot_property_vs_concentration
 
@@ -272,40 +263,41 @@ if 1==0:
         site_type=2,
         cemodel=ce_model_2,
         property_name ="e_ads",
-        yaxis_label = "$E_{\\textrm{ads}}(\\bm{\\sigma})$ [arb. units]",
+        yaxis_label = "Energy of adsorption [a.u.]",
         show_plot = False,
-        fname="optcu_PLOT_2.png")
+        fig_fname="optcu_PLOT_2.png",
+        data_fname="optcu_PLOT_2")
     ######################################
 
-if 1==0:
+if 1==1:
     from clusterx.visualization import plot_optimization_vs_number_of_clusters
     plot_optimization_vs_number_of_clusters(
-        mb.get_selector(),
-        ymin=0.00,
-        ymax=0.04,
+        mb_2.get_selector(),
+        ymin=-0.0005,
+        ymax=0.024,
         xmin=0,
-        xmax=125,
-        yaxis_label = "Energy [arb. units]",
+        xmax=50,
+        yaxis_label = "Energy [a.u.]",
         show_plot = False,
-        fname="optcu_PLOT_3.png"
+        fig_fname="optcu_PLOT_3.png",
+        data_fname="optcu_PLOT_3"
     )
 
-# SRHERE
-
-if 1==0:
+if 1==1:
     from clusterx.model import ModelBuilder
     mb_3 = ModelBuilder(
-	selector_type="lasso_cv", 
-	selector_opts={'sparsity_max': 1e-2,'sparsity_min': 1e-6}, 
-	estimator_type="skl_Ridge", 
-	estimator_opts={"alpha":1e-8,"fit_intercept":False})
+        selector_type="lasso_cv", 
+        selector_opts={'sparsity_max': 1e-2,'sparsity_min': 1e-6}, 
+        estimator_type="skl_Ridge", 
+        estimator_opts={"alpha":1e-8,"fit_intercept":True}
+    )
 
     ce_model_3 = mb_3.build(sset, cpool, "e_ads")
     ce_model_3.report_errors(sset)
 
     #_NOT_IN_PAPER [
     ce_model_3.serialize(filepath="optcu_CE_MODEL_3.pickle", fmt="pickle")
-    mb_3.serialize(filepath="optcu_MODELBDR_3.pickle")
+    #mb_3.serialize(filepath="optcu_MODELBDR_3.pickle") # Fails with TypeError: cannot pickle '_io.BufferedWriter' object
     opt_cpool_3 = mb_3.get_opt_cpool()
     opt_cpool_3.serialize(db_name="optcu_CPOOL_OPT_3.json")
     #_NOT_IN_PAPER ]
@@ -318,77 +310,30 @@ if 1==0:
     opt_cpool_3 = mb_3.get_opt_cpool()
     #_NOT_IN_PAPER
 
-if 1==0:
+if 1==1:
     from clusterx.visualization import plot_optimization_vs_number_of_clusters
     plot_optimization_vs_number_of_clusters(
         mb_3.get_selector(),
-        ymin=0.00,
-        ymax=0.04,
+        ymin=-0.001,
+        ymax=0.02,
         xmin=0,
         xmax=125,
-        yaxis_label = "Energy [arb. units]",
+        yaxis_label = "Energy [a.u.]",
         show_plot = False,
-        fname="optcu_PLOT_4.png"
+        fig_fname="optcu_PLOT_4.png",
+        data_fname="optcu_PLOT_4"
     )
 
-if 1==0:
+if 1==1:
     from clusterx.visualization import plot_optimization_vs_sparsity
     plot_optimization_vs_sparsity(
         mb_3.get_selector(),
+        xmin=1e-6,
+        xmax=1e-3,
+        ymin=-0.0003,
+        ymax=0.009,
+        yaxis_label = "Energy [a.u.]",
         show_plot = False,
         fname="optcu_PLOT_5.png"
     )
     
-
-#///////////////////////////////
-if 1==0:
-    from clusterx.visualization import plot_property_vs_concentration
-    from clusterx.estimators.estimator_factory import EstimatorFactory
-    from clusterx.model import Model
-    import numpy as np
-
-    #lre = EstimatorFactory.create("skl_LinearRegression")
-    #lre = EstimatorFactory.create("skl_RidgeCV", alphas=np.logspace(-10, -2, 50), scoring = 'neg_mean_squared_error')
-    lre = EstimatorFactory.create("skl_Ridge", alpha=1e-8)
-    x = corrcal.get_correlation_matrix(sset)
-    p = sset.get_property_values("e_ads")
-    lre.fit(x,p)
-    #print("Alpha: ",lre.alpha_)
-    ce_model1 = Model(corrcal, "e_ads", estimator = lre)
-    ce_model1.report_errors(sset)
-    #print(" - Alpha: ",lre.alpha_)
-
-
-    plot_property_vs_concentration(sset, site_type=2, property_name ="e_ads", show_plot = True, cemodel=ce_model1)
-
-if 1==0:
-    from clusterx.visualization import plot_property_vs_concentration
-    from clusterx.model import ModelBuilder
-
-    mb2 = ModelBuilder(selector_type="lasso", selector_opts={'sparsity_max': 1e-4,'sparsity_min': 1e-7}, estimator_type="skl_LinearRegression", estimator_opts={"fit_intercept":True})
-    ce_model2 = mb2.build(sset, cpool, "e_ads")
-    cpool_opt2 = mb2.get_opt_cpool()
-    ce_model2.report_errors(sset)
-    cpool_opt2.display_info(ecis=ce_model2.get_ecis())
-
-    plot_property_vs_concentration(sset, site_type=2, property_name ="e_ads", show_plot = True, cemodel=ce_model2)
-    from clusterx.visualization import plot_optimization_vs_sparsity
-    plot_optimization_vs_sparsity(mb2.get_selector())
-
-if 1==0:
-    from clusterx.visualization import plot_property_vs_concentration
-    from clusterx.model import ModelBuilder
-
-    import numpy as np
-    n_alphas = 200
-    alphas = np.logspace(-10, -2, n_alphas)
-    #mb3 = ModelBuilder(selector_type="linreg", selector_opts={'clusters_sets':'size'}, estimator_type="skl_RidgeCV", estimator_opts={"alphas":alphas,"fit_intercept":False})
-    mb3 = ModelBuilder(selector_type="linreg", selector_opts={'clusters_sets':'size'}, estimator_type="skl_Ridge", estimator_opts={"alpha":1e-8,"fit_intercept":False})
-    ce_model3 = mb3.build(sset, cpool, "e_ads")
-    cpool_opt3 = mb3.get_opt_cpool()
-    ce_model3.report_errors(sset)
-    cpool_opt3.display_info(ecis=ce_model3.get_ecis())
-
-    plot_property_vs_concentration(sset, site_type=2, property_name ="e_ads", show_plot = True, cemodel=ce_model3)
-    from clusterx.visualization import plot_optimization_vs_number_of_clusters
-    plot_optimization_vs_number_of_clusters(mb3.get_selector())
