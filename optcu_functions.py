@@ -16,13 +16,11 @@ def total_energy(structure: Structure) -> float:
     """
     from ase.calculators.emt import EMT
     from ase.optimize import BFGS
-    from ase import Atoms
     from ase.io import read
     from ase.constraints import FixAtoms,FixedLine,FixedPlane
     from clusterx.utils import remove_vacancies
     import numpy as np
 
-    nat = len(structure)
     at = structure.get_atoms()
     at.set_calculator(EMT())
     _structure = remove_vacancies(at)
@@ -37,7 +35,7 @@ def total_energy(structure: Structure) -> float:
         cstrs.append(FixedLine(i,direction=[0,0,1]))
     for i in np.argwhere(np.array([atom.z<15.0 and atom.z>13.0 for atom in _structure])==True):
         cstrs.append(FixedPlane(i,[0,0,1]))
-    structure.set_constraint(cstrs)
+    _structure.set_constraint(cstrs)
 
     # Perform relaxation with BFGS and compute total energy
     e0 = _structure.get_potential_energy()
@@ -192,7 +190,7 @@ def references() -> None:
 ####################
 from clusterx.structure import Structure
 
-def ads_energy(structure, eCu_bulk=-6.978e-3, ePt_bulk=-1.821e-4, eO=3.134e-1, eCu_slab=11.2951):
+def ads_energy(str_index, structure, eCu_bulk=-6.978e-3, ePt_bulk=-1.821e-4, eO=3.134e-1, eCu_slab=11.2951):
     """Compute energy of adsorption of O @ PtCu surface alloy
     
     Parameters:
@@ -210,6 +208,5 @@ def ads_energy(structure, eCu_bulk=-6.978e-3, ePt_bulk=-1.821e-4, eO=3.134e-1, e
     xPt = conc[2][1] # sublattice type 2: ['Cu' 'Pt'], concentration of Pt
 
     eads = e/nsites - xO*eO - xPt*(ePt_bulk-eCu_bulk) - eCu_slab/nsites
-
     return eads
 ####################
