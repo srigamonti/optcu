@@ -1,3 +1,12 @@
+optcu_PLOT_1.png
+optcu_PLOT_1.txt.npz
+optcu_REFERENCES.txt
+optcu_STRUCTURES_SET_1.json
+Pt.traj
+Cu.traj
+rel.traj
+cellconfig.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
