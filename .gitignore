@@ -5,7 +5,29 @@ optcu_STRUCTURES_SET_1.json
 Pt.traj
 Cu.traj
 rel.traj
+rel.log
 cellconfig.json
+.DS_Store
+optcu_CCALC.pickle
+optcu_CE_MODEL_1.pickle
+optcu_CE_MODEL_1_CCALC.pickle
+optcu_CE_MODEL_2.pickle
+optcu_CE_MODEL_2_CCALC.pickle
+optcu_CE_MODEL_3.pickle
+optcu_CE_MODEL_3_CCALC.pickle
+optcu_CPOOL.json
+optcu_CPOOL_OPT_2.json
+optcu_CPOOL_OPT_3.json
+optcu_MODELBDR_2.pickle
+optcu_MODELBDR_3.pickle
+optcu_PARENT_LATTICE.json
+optcu_PLOT_2.npz
+optcu_PLOT_2.png
+optcu_PLOT_3.npz
+optcu_PLOT_3.png
+optcu_PLOT_5.png
+optcu_SUPER_CELL.json
+optcu_XP.npz
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

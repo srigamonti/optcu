@@ -1,4 +1,3 @@
-####################
 from clusterx.structure import Structure
 
 def total_energy(structure: Structure) -> float:
@@ -45,11 +44,8 @@ def total_energy(structure: Structure) -> float:
     e1 = rel_str.get_potential_energy()
 
     return e1, rel_str, e0, structure
-    #return e1
-####################
 
-####################
-def references() -> None:
+def references(structure: Structure) -> None:
     """Compute reference energies
     
     Compute the reference energies needed for the 
@@ -183,11 +179,16 @@ def references() -> None:
     eO2 = min(es)
     infostr += f"Energy O2: {eO2}\n"
     infostr += f"Energy O: {eO2/2.0}"
-    eCu_slab = 0.0
-    return eCu_bulk, ePt_bulk, eO2/2.0, eCu_slab, infostr
-####################
+    
+    # Cu(111) Slab
+    eCu_slab,_,_,_ = total_energy(structure)
+    infostr += "\n\n\nEnergy pristine Cu(111), relaxed\n"
+    infostr += "---------------------------------\n"
+    infostr += f"{eCu_slab:8.4f}\n"
+    infostr += "---------------------------------\n\n"
 
-####################
+    return eCu_bulk, ePt_bulk, eO2/2.0, eCu_slab, infostr
+
 from clusterx.structure import Structure
 
 def ads_energy(str_index, structure, eCu_bulk=-6.978e-3, ePt_bulk=-1.821e-4, eO=3.134e-1, eCu_slab=11.2951):
@@ -209,4 +210,4 @@ def ads_energy(str_index, structure, eCu_bulk=-6.978e-3, ePt_bulk=-1.821e-4, eO=
 
     eads = e/nsites - xO*eO - xPt*(ePt_bulk-eCu_bulk) - eCu_slab/nsites
     return eads
-####################
+
