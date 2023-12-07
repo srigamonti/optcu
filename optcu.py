@@ -260,10 +260,10 @@ def example_ce_optcu(task):
         from clusterx.visualization import plot_optimization_vs_sparsity
         plot_optimization_vs_sparsity(
             mb_3.get_selector(),
-            #xmin=1e-6,
-            #xmax=1e-3,
-            #ymin=-0.0003,
-            #ymax=0.009,
+            xmin=1e-6,
+            xmax=1e-3,
+            ymin=-0.0003,
+            ymax=0.009,
             yaxis_label = "Energy [a.u.]",
             show_plot = False,
             fname="optcu_PLOT_5.png"
